@@ -3,7 +3,7 @@ blueprint:
   description:
     Automatic heating based on a scheduler, presence of people and optional
     dependencies such as window opening, winter mode or party mode.
-  source_url: https://github.com/sardfox/homeassistant/blob/main/heating_control.yaml
+  source_url: https://github.com/sardfox/homeassistant/blob/main/heating_valves_control.yaml
   domain: automation
   input:
     heating:
