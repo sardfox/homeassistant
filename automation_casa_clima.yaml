@@ -1,0 +1,170 @@
+alias: Casa Clima
+description: ""
+trigger_variables:
+    climate_on: 23
+    climate_off: 13
+    input_studio: "{{ states('input_number.studio_input_temperature') }}"
+trigger:
+  - platform: numeric_state
+    entity_id: sensor.termometro_studio_temperature
+    above: 19.5
+  - platform: numeric_state
+    entity_id: sensor.termometro_studio_temperature
+    below: 18.5
+  - platform: numeric_state
+    entity_id: sensor.termometro_camera_temperature
+    above: 17.5
+  - platform: numeric_state
+    entity_id: sensor.termometro_camera_temperature
+    below: 16.5
+  - platform: numeric_state
+    entity_id: sensor.termometro_cucina_su_temperature
+    above: 18.5
+  - platform: numeric_state
+    entity_id: sensor.termometro_cucina_su_temperature
+    below: 17.5
+  - platform: numeric_state
+    entity_id: sensor.rm4_temperature
+    above: 19.5
+  - platform: numeric_state
+    entity_id: sensor.rm4_temperature
+    below: 18.5
+  - platform: numeric_state
+    entity_id: sensor.termostato_temperature
+    above: 18.5
+  - platform: numeric_state
+    entity_id: sensor.termostato_temperature
+    below: 17.5
+  - platform: state
+    entity_id:
+      - binary_sensor.termovalvole
+condition: []
+action:
+  - choose:
+      - conditions:
+          - condition: numeric_state
+            entity_id: sensor.termometro_studio_temperature
+            above: 19.5
+        sequence:
+          - service: climate.set_temperature
+            data:
+              temperature: "{{climate_off}}"
+            target:
+              area_id: studio
+      - conditions:
+          - condition: numeric_state
+            entity_id: sensor.termometro_studio_temperature
+            below: 18.5
+        sequence:
+          - service: climate.set_temperature
+            data:
+              temperature: "{{climate_on}}"
+            target:
+              area_id: studio
+  - choose:
+      - conditions:
+          - condition: numeric_state
+            entity_id: sensor.termometro_camera_temperature
+            above: 17.5
+        sequence:
+          - service: climate.set_temperature
+            data:
+              temperature: "{{climate_off}}"
+            target:
+              area_id: 787b78ecb1cc4890942196fff1804a38
+      - conditions:
+          - condition: numeric_state
+            entity_id: sensor.termometro_camera_temperature
+            below: 16.5
+        sequence:
+          - service: climate.set_temperature
+            data:
+              temperature: "{{climate_on}}"
+            target:
+              area_id: 787b78ecb1cc4890942196fff1804a38
+  - choose:
+      - conditions:
+          - condition: numeric_state
+            entity_id: sensor.termometro_cucina_su_temperature
+            above: 18.5
+        sequence:
+          - service: climate.set_temperature
+            data:
+              temperature: "{{climate_off}}"
+            target:
+              area_id: adb9c80a493b4174ae753748031dbe4b
+      - conditions:
+          - condition: numeric_state
+            entity_id: sensor.termometro_cucina_su_temperature
+            below: 17.5
+        sequence:
+          - service: climate.set_temperature
+            data:
+              temperature: "{{climate_on}}"
+            target:
+              area_id: adb9c80a493b4174ae753748031dbe4b
+  - choose:
+      - conditions:
+          - condition: numeric_state
+            entity_id: sensor.rm4_temperature
+            above: 19.5
+        sequence:
+          - service: climate.set_temperature
+            data:
+              temperature: "{{climate_off}}"
+            target:
+              area_id:
+                - ca7cbe8238284b22a4f204ad7558b46f
+      - conditions:
+          - condition: numeric_state
+            entity_id: sensor.rm4_temperature
+            below: 18.5
+        sequence:
+          - service: climate.set_temperature
+            data:
+              temperature: "{{climate_on}}"
+            target:
+              area_id: ca7cbe8238284b22a4f204ad7558b46f
+  - choose:
+      - conditions:
+          - condition: numeric_state
+            entity_id: sensor.termostato_temperature
+            above: 18.5
+        sequence:
+          - service: climate.set_temperature
+            data:
+              temperature: "{{climate_off}}"
+            target:
+              area_id: corridoio_su
+      - conditions:
+          - condition: numeric_state
+            entity_id: sensor.termostato_temperature
+            below: 17.5
+        sequence:
+          - service: climate.set_temperature
+            data:
+              temperature: "{{climate_on}}"
+            target:
+              area_id: corridoio_su
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.termovalvole
+            state: "on"
+        sequence:
+          - service: climate.set_temperature
+            data:
+              temperature: "{{climate_on}}"
+            target:
+              entity_id: climate.termostato
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.termovalvole
+            state: "off"
+        sequence:
+          - service: climate.set_temperature
+            data:
+              temperature: "{{climate_off}}"
+            target:
+              entity_id: climate.termostato
+mode: single

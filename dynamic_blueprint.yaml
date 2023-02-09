@@ -1,0 +1,92 @@
+blueprint:
+  name: Controller Light
+  description: Turn on a light when motion is detected.
+  domain: automation
+  input:
+    entity_light:
+      name: Light
+      selector:
+        target:
+          entity:
+            domain: light
+
+    entity_motion:
+      name: Motion Sensor
+      selector:
+        entity:
+          domain: binary_sensor
+          device_class: motion
+
+    delay_motion:
+      name: Delay
+      description: Time to leave the light on after last motion is detected.
+      default: 120
+      selector:
+        number:
+          min: 0
+          max: 3600
+          unit_of_measurement: seconds
+
+    light_data:
+      name: Light data
+      default:
+        turn_on: {}
+        turn_off: {}
+        toggle: {}
+        brightness: {}
+
+
+mode: restart
+max_exceeded: silent
+
+variables:
+  light_data: !input light_data
+  toggle_data: "{{ light_data['toggle_data'] if 'toggle_data' in light_data else {} }}"
+  turn_on_data: "{{ light_data['turn_on_data'] if 'turn_on_data' in light_data else {} }}"
+  turn_off_data: "{{ light_data['turn_off_data'] if 'turn_off_data' in light_data else {} }}"
+  brightness_data: "{{ light_data['brightness_data'] if 'brightness_data' in light_data else {} }}"
+
+trigger:
+  - id: motion_on
+    platform: state
+    entity_id: !input entity_motion
+    from: "off"
+    to: "on"
+  - id: motion_off
+    platform: state
+    entity_id: !input entity_motion
+    from: "on"
+    to: "off"
+    for:
+      seconds: !input delay_motion
+  - if:
+      - condition: template
+        value_template: "{{ toggle_data }}"
+    then:
+      {% for entity_id in toggle_data %}
+        - id: toggle
+          platform: state
+          entity_id: "{{ entity_id }}"
+          to: "{{ toggle_data[entity_id] }}"
+      {% endfor %}
+
+
+action:
+  - if:
+      - condition: trigger
+        id: motion_on
+    then:
+      - service: light.turn_on
+        target: !input entity_light
+  - if:
+      - condition: trigger
+        id: motion_off
+    then:
+      - service: light.turn_off
+        target: !input entity_light
+  - if:
+      - condition: trigger
+        id: toggle
+    then:
+      - service: light.toggle
+        target: !input entity_light

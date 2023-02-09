@@ -1,0 +1,22 @@
+alias: Clima Casa
+description: ""
+trigger_variables:
+    studio_delta: >-
+      {{ (states('sensor.termometro_studio_temperature') | float) - (states('input_number.studio_input_temperature') | float) }}
+    climate_on: 25
+    climate_off: 13
+trigger:
+  - platform: template
+    value_template: "{{ studio_delta > 0.5 or studio_delta < -0.5 }}"
+condition: []
+action:
+  - choose:
+      - conditions: >
+          {{ studio_delta > 0.5 or studio_delta < -0.5 }}
+        sequence:
+          - service: climate.set_temperature
+            data:
+              temperature: "{% if studio_delta > 0.5 %}{{climate_off}}{% else %}{{climate_on}}{% endif %}"
+            target:
+              area_id: studio
+mode: restart
