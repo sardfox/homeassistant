@@ -51,7 +51,7 @@ blueprint:
       description: Valves Group
       selector:
         entity:
-          domain: group
+          domain: binary_sensor
           multiple: false
 variables:
   valves_group: !input valves_group
@@ -62,7 +62,6 @@ variables:
   valves: !input valves
 
 trigger_variables:
-  - entity_triggered: "{{ trigger.entity_id }}"
   - area_id: "{{ area_id(trigger.entity_id) }}"
   - temp_trig: "{{ area_entities(area_id) | selectattr('attributes.device_class', 'eq', 'temperature')}}"
   - input_trig: "{{ area_entities(area_id) | selectattr('attributes.domain', 'eq', 'input')}}"
